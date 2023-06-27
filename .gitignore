@@ -1,0 +1,13 @@
+*.exe
+*.exe~
+main
+
+*.bat
+
+commands.txt
+
+/tmp
+
+*.pem
+
+fly.toml
