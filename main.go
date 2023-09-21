@@ -25,7 +25,7 @@ func main() {
 	r.MethodNotAllowed(exthandler.MethodNotAllowedStatusText)
 
 	r.Use(middleware.RealIP)
-	r.Use(middleware.Logger)
+	r.Use(extmiddleware.Logger(logger.Stdout))
 	r.Use(middleware.Recoverer)
 	r.Use(extmiddleware.LimitBytes(200))
 	r.Use(middleware.NoCache)
@@ -37,13 +37,18 @@ func main() {
 				return
 			}
 
+			host, _, err := net.SplitHostPort(r.Host)
+			if err != nil {
+				host = r.Host
+			}
+
 			port, ok := r.Context().Value(portKey{}).(string)
 			if !ok {
 				extrespond.PlainText(w, "no port found for incoming request", http.StatusInternalServerError)
 				return
 			}
 
-			greeting := fmt.Sprintf("Hello, World! - Port %s", port)
+			greeting := fmt.Sprintf("Hello, World! - Port %s - Host %s", port, host)
 
 			extrespond.PlainText(w, greeting, http.StatusOK)
 		},
