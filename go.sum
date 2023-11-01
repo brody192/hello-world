@@ -1,10 +1,8 @@
-github.com/brody192/ext v0.1.15 h1:PyTXBAMVEh3kpfRrtgeI9CPuuSpOZgXY65epHaRZfJA=
-github.com/brody192/ext v0.1.15/go.mod h1:KA0pcow8z+aZFbAVexb2cHWRig2rGxgnnE2Lu15Gu18=
-github.com/brody192/logger v0.0.1 h1:ndSW8SKI21+1decIKf9foJVFInsRGq3RyMWLaJoAibA=
-github.com/brody192/logger v0.0.1/go.mod h1:K/hO0R28EhchnqHMBePAwnFaj/YKrDmls5c/FNjX7Fs=
+github.com/brody192/ext v1.0.1 h1:wcht+Mm4bW01y05FNcNCEm3v5+l0BS30mFKdDEdKs5o=
+github.com/brody192/ext v1.0.1/go.mod h1:uVAB4eWix9WONMGACnje9YYAXtwlNES6bhxsqQwdcag=
+github.com/brody192/logger v0.0.2 h1:6oar2SjCSbvuI/6rd4YxLrKq3rK8ESzoM4INDKLCwBM=
+github.com/brody192/logger v0.0.2/go.mod h1:U5FG46DkOU21OlsjjoMIwXOnh2+8/erIMTNUGag3pwU=
 github.com/go-chi/chi/v5 v5.0.10 h1:rLz5avzKpjqxrYwXNfmjkrYYXOyLJd37pz53UFHC6vk=
 github.com/go-chi/chi/v5 v5.0.10/go.mod h1:DslCQbL2OYiznFReuXYUmQ2hGd1aDpCnlMNITLSKoi8=
 github.com/go-chi/cors v1.2.1 h1:xEC8UT3Rlp2QuWNEr4Fs/c2EAGVKBwy/1vHx3bppil4=
 github.com/go-chi/cors v1.2.1/go.mod h1:sSbTewc+6wYHBBCW7ytsFSn836hqM7JxpglAy2Vzc58=
-golang.org/x/exp v0.0.0-20230905200255-921286631fa9 h1:GoHiUyI/Tp2nVkLI2mCxVkOjsbSXD66ic0XW0js0R9g=
-golang.org/x/exp v0.0.0-20230905200255-921286631fa9/go.mod h1:S2oDrQGGwySpoQPVqRShND87VCbxmc6bL1Yd2oYrm6k=

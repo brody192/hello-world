@@ -3,26 +3,31 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/http"
+	"os"
+	"strconv"
+	"strings"
 	"time"
 
-	"github.com/brody192/ext/exthandler"
-	"github.com/brody192/ext/extmiddleware"
-	"github.com/brody192/ext/extrespond"
+	extmiddleware "github.com/brody192/ext/middleware"
+
+	"github.com/brody192/ext/handler"
+	"github.com/brody192/ext/respond"
+	"github.com/brody192/ext/utilities"
 	"github.com/brody192/logger"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-	"golang.org/x/exp/slog"
 )
 
-type portKey struct{}
-
 func main() {
+	type portKey struct{}
+
 	var r = chi.NewRouter()
 
-	r.MethodNotAllowed(exthandler.MethodNotAllowedStatusText)
+	r.MethodNotAllowed(handler.MethodNotAllowedStatusText)
 
 	r.Use(middleware.RealIP)
 	r.Use(extmiddleware.Logger(logger.Stdout))
@@ -31,7 +36,7 @@ func main() {
 	r.Use(middleware.NoCache)
 	r.Use(cors.AllowAll().Handler)
 
-	exthandler.MatchMethods(r, []string{http.MethodGet, http.MethodPost, http.MethodHead}, "/*",
+	handler.MatchMethods(r, []string{http.MethodGet, http.MethodPost, http.MethodHead}, "/*",
 		func(w http.ResponseWriter, r *http.Request) {
 			if r.Method == http.MethodHead {
 				return
@@ -44,45 +49,67 @@ func main() {
 
 			port, ok := r.Context().Value(portKey{}).(string)
 			if !ok {
-				extrespond.PlainText(w, "no port found for incoming request", http.StatusInternalServerError)
+				respond.PlainText(w, "no port found for incoming request", http.StatusInternalServerError)
 				return
 			}
 
 			greeting := fmt.Sprintf("Hello, World! - Port %s - Host %s", port, host)
 
-			extrespond.PlainText(w, greeting, http.StatusOK)
+			respond.PlainText(w, greeting, http.StatusOK)
 		},
 	)
 
-	ports := []string{"8000", "8001", "8002", "8003", "8004", "8005"}
+	ports := []string{
+		strings.TrimPrefix(utilities.EnvPortOr("3000"), ":"),
+	}
+
+	if envPorts := strings.TrimSpace(os.Getenv("PORTS")); envPorts != "" {
+		if unquotedEnv, err := strconv.Unquote(envPorts); err == nil {
+			envPorts = unquotedEnv
+		}
+
+		for _, port := range strings.Split(envPorts, ",") {
+			port = strings.TrimSpace(port)
+
+			if p, err := strconv.Atoi(port); err != nil || p < 1024 || p > 65535 {
+				logger.Stderr.Warn("port from env PORTS invalid", slog.String("invalid_port", port))
+				continue
+			}
+
+			ports = append(ports, port)
+		}
+	}
 
 	errChan := make(chan error, 1)
 
+	logger.Stdout.Info("starting server(s)", slog.String("ports", strings.Join(ports, ",")))
+
 	for _, port := range ports {
-		server := &http.Server{
-			Addr:    ":" + port,
-			Handler: r,
-			ConnContext: func(ctx context.Context, c net.Conn) context.Context {
-				_, port, err := net.SplitHostPort(c.LocalAddr().String())
-				if err != nil {
-					return ctx
-				}
-
-				return context.WithValue(ctx, portKey{}, port)
-
-			},
-			ReadTimeout:       1 * time.Minute,
-			WriteTimeout:      1 * time.Minute,
-			ReadHeaderTimeout: 1 * time.Second,
-		}
-
 		go func(port string) {
-			logger.Stdout.Info("starting server", slog.String("port", port))
+			server := &http.Server{
+				Addr:    ":" + port,
+				Handler: r,
+				ConnContext: func(ctx context.Context, c net.Conn) context.Context {
+					_, port, err := net.SplitHostPort(c.LocalAddr().String())
+					if err != nil {
+						return ctx
+					}
+
+					return context.WithValue(ctx, portKey{}, port)
+
+				},
+				ReadTimeout:       1 * time.Minute,
+				WriteTimeout:      1 * time.Minute,
+				ReadHeaderTimeout: 1 * time.Second,
+			}
+
 			errChan <- server.ListenAndServe()
 		}(port)
 	}
 
-	if err := <-errChan; err != nil {
-		logger.Stderr.Error("server exited", logger.ErrAttr(err))
+	for err := range errChan {
+		if err != nil {
+			logger.Stderr.Error("server exited with error", logger.ErrAttr(err))
+		}
 	}
 }
