@@ -1,12 +1,14 @@
 ############# STAGE 1 #############
 
-FROM golang:1.20.5-alpine3.18 as builder
+FROM golang:1.21.3-alpine3.18 as builder
 
 WORKDIR /app
 
-COPY . ./
+COPY go.mod go.sum ./
 
 RUN go mod download
+
+COPY . ./
 
 RUN go build -ldflags "-w -s -extldflags '-static'" -a -o main
 
