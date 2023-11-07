@@ -1,7 +1,5 @@
 github.com/brody192/ext v1.0.1 h1:wcht+Mm4bW01y05FNcNCEm3v5+l0BS30mFKdDEdKs5o=
 github.com/brody192/ext v1.0.1/go.mod h1:uVAB4eWix9WONMGACnje9YYAXtwlNES6bhxsqQwdcag=
-github.com/brody192/logger v0.0.2 h1:6oar2SjCSbvuI/6rd4YxLrKq3rK8ESzoM4INDKLCwBM=
-github.com/brody192/logger v0.0.2/go.mod h1:U5FG46DkOU21OlsjjoMIwXOnh2+8/erIMTNUGag3pwU=
 github.com/brody192/logger v0.0.3 h1:5tgw4Bs/NDP9iMdmOS7knR3/cbvu5OzO0q3tf28EEqc=
 github.com/brody192/logger v0.0.3/go.mod h1:U5FG46DkOU21OlsjjoMIwXOnh2+8/erIMTNUGag3pwU=
 github.com/go-chi/chi/v5 v5.0.10 h1:rLz5avzKpjqxrYwXNfmjkrYYXOyLJd37pz53UFHC6vk=
