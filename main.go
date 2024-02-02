@@ -36,6 +36,10 @@ func main() {
 	r.Use(middleware.NoCache)
 	r.Use(cors.AllowAll().Handler)
 
+	r.Get("/healthz", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(200)
+	})
+
 	handler.MatchMethods(r, []string{http.MethodGet, http.MethodPost, http.MethodHead}, "/*",
 		func(w http.ResponseWriter, r *http.Request) {
 			if r.Method == http.MethodHead {
