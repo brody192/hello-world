@@ -32,7 +32,7 @@ func main() {
 	r.Use(middleware.RealIP)
 	r.Use(extmiddleware.Logger(logger.Stdout))
 	r.Use(middleware.Recoverer)
-	r.Use(extmiddleware.LimitBytes(200))
+	r.Use(extmiddleware.LimitBytes(15728640)) //15mb
 	r.Use(middleware.NoCache)
 	r.Use(cors.AllowAll().Handler)
 
