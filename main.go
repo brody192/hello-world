@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cmp"
 	"context"
 	"fmt"
 	"log/slog"
@@ -15,7 +16,6 @@ import (
 
 	"github.com/brody192/ext/handler"
 	"github.com/brody192/ext/respond"
-	"github.com/brody192/ext/utilities"
 	"github.com/brody192/logger"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -63,9 +63,7 @@ func main() {
 		},
 	)
 
-	ports := []string{
-		strings.TrimPrefix(utilities.EnvPortOr("3000"), ":"),
-	}
+	ports := []string{}
 
 	if envPorts := strings.TrimSpace(os.Getenv("PORTS")); envPorts != "" {
 		if unquotedEnv, err := strconv.Unquote(envPorts); err == nil {
@@ -82,6 +80,10 @@ func main() {
 
 			ports = append(ports, port)
 		}
+	}
+
+	if len(ports) == 0 {
+		ports = append(ports, cmp.Or(os.Getenv("PORT"), "3000"))
 	}
 
 	errChan := make(chan error, 1)
@@ -114,6 +116,7 @@ func main() {
 	for err := range errChan {
 		if err != nil {
 			logger.Stderr.Error("server exited with error", logger.ErrAttr(err))
+			os.Exit(1)
 		}
 	}
 }

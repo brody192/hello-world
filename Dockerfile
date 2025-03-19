@@ -1,6 +1,4 @@
-############# STAGE 1 #############
-
-FROM golang:1.21.6-alpine3.18 as builder
+FROM golang:1.23.2-alpine AS builder
 
 WORKDIR /app
 
@@ -11,8 +9,6 @@ RUN go mod download
 COPY . ./
 
 RUN go build -ldflags "-w -s -extldflags '-static'" -a -o main
-
-############# STAGE 2 #############
 
 FROM gcr.io/distroless/static
 
