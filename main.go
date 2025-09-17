@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -102,16 +103,24 @@ func main() {
 	errChan := make(chan error, 1)
 
 	host := cmp.Or(os.Getenv("HOST"), "")
+	network := cmp.Or(os.Getenv("NETWORK"), "tcp")
+
+	allowedNetworks := []string{"tcp", "tcp4", "tcp6"}
+
+	if !slices.Contains(allowedNetworks, network) {
+		logger.Stderr.Error("invalid network", slog.String("network", network))
+		return
+	}
 
 	logger.Stdout.Info("starting server(s)",
 		slog.String("ports", strings.Join(ports, ",")),
-		slog.String("host", host),
+		slog.String("host", cmp.Or(host, "<empty>")),
+		slog.String("network", network),
 	)
 
 	for _, port := range ports {
 		go func(port string) {
 			server := &http.Server{
-				Addr:    host + ":" + port,
 				Handler: r,
 				ConnContext: func(ctx context.Context, c net.Conn) context.Context {
 					_, port, err := net.SplitHostPort(c.LocalAddr().String())
@@ -127,7 +136,13 @@ func main() {
 				ReadHeaderTimeout: 1 * time.Second,
 			}
 
-			errChan <- server.ListenAndServe()
+			listener, err := net.Listen(network, host+":"+port)
+			if err != nil {
+				errChan <- err
+				return
+			}
+
+			errChan <- server.Serve(listener)
 		}(port)
 	}
 
