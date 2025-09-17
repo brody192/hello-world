@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cmp"
 	"context"
 	"fmt"
 	"log/slog"
@@ -100,12 +101,17 @@ func main() {
 
 	errChan := make(chan error, 1)
 
-	logger.Stdout.Info("starting server(s)", slog.String("ports", strings.Join(ports, ",")))
+	host := cmp.Or(os.Getenv("HOST"), "")
+
+	logger.Stdout.Info("starting server(s)",
+		slog.String("ports", strings.Join(ports, ",")),
+		slog.String("host", host),
+	)
 
 	for _, port := range ports {
 		go func(port string) {
 			server := &http.Server{
-				Addr:    ":" + port,
+				Addr:    host + ":" + port,
 				Handler: r,
 				ConnContext: func(ctx context.Context, c net.Conn) context.Context {
 					_, port, err := net.SplitHostPort(c.LocalAddr().String())
