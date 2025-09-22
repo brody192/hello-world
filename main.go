@@ -24,15 +24,6 @@ import (
 	"github.com/go-chi/cors"
 )
 
-var (
-	startTime     time.Time
-	initDelayTime = 5 * time.Second
-)
-
-func init() {
-	startTime = time.Now().UTC()
-}
-
 func main() {
 	type portKey struct{}
 
@@ -48,11 +39,6 @@ func main() {
 	r.Use(cors.AllowAll().Handler)
 
 	r.Get("/healthz", func(w http.ResponseWriter, _ *http.Request) {
-		if time.Since(startTime) <= initDelayTime {
-			w.WriteHeader(503)
-			return
-		}
-
 		w.WriteHeader(200)
 	})
 
