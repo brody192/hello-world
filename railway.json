@@ -10,7 +10,7 @@
       "useLegacyStacker": false,
       "ipv6EgressEnabled": false,
       "multiRegionConfig": {
-        "us-east4-eqdc4a": {
+        "us-east4": {
           "numReplicas": 24
         }
       },
